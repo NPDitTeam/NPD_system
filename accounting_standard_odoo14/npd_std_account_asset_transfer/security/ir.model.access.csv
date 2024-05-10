@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+account_asset_transfer,account_asset_transfer,model_std_account_asset_transfer,base.group_user,1,1,1,0
+account_asset_transfer_manager,account_asset_transfer_manager,model_std_account_asset_transfer,npd_std_asset_menu.group_asset_manager,1,1,1,1
+account_asset_transfer_type,account_asset_transfer_type,model_std_account_asset_transfer_type,base.group_user,1,0,0,0
+account_asset_transfer_type_manager,account_asset_transfer_type_manager,model_std_account_asset_transfer_type,npd_std_asset_menu.group_asset_manager,1,1,1,1
+account_asset_transfer_report,account_asset_transfer_report,model_std_account_asset_transfer_report,base.group_user,1,1,1,0
+

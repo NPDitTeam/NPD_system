@@ -1,0 +1,20 @@
+{
+    'name': 'NPD Petty Cash Summary',
+    'version': '14.0.1',
+    'summary': 'Petty Cash Summary',
+    'description': 'Petty Cash Summary',
+    'category': 'Base',
+    'author': 'NPD',
+    'license': 'LGPL-3',
+    'depends': [],
+    'installable': True,
+    'auto_install': False,
+    "data": [
+        'security/ir.model.access.csv',
+        'data/paper_format.xml',
+        'data/report_data.xml',
+        'views/view.xml',
+        'wizard/petty_cash_summary.xml',
+        'reports/petty_cash_summary.xml',
+    ],
+}
