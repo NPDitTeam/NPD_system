@@ -1,1 +1,0 @@
-# accounting_standard_odoo14

@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 {
-    "name": "Pdf Print Preview",
+    "name": "PDF Print Preview",
     "version": "1.0",
     "depends": ["web"],
     "author": "itechgroup",
