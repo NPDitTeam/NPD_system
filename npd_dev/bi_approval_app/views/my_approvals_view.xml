@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="view_my_approval_tree">
+            <field name="name">my.approval.tree</field>
+            <field name="model">my.approval</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="My Approvals" create="false">
+                    <field name="name"/>
+                    <field name="request_by"/>
+                    <field name="request_date"/>
+                    <field name="user_ids" widget="many2many_tags" readonly="1" />
+                    <field name="payment"/>
+<!--                    <field name="state"/>-->
+                     <field name="state" widget="badge" options="{'color': {'draft': 'o_status_color_draft', 'submit': 'o_status_color_submit', 'approve': 'o_status_color_approve', 'cancel': 'o_status_color_cancel'}}"/>
+
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_my_approval_form" model="ir.ui.view">
+            <field name="name">my.approval.form</field>
+            <field name="model">my.approval</field>
+            <field name="arch" type="xml">
+                <form string="My Approvals" create="false">
+                    <header>
+                        <field name="is_approved" invisible="1"/>
+                        <button name="action_approve" string="Approve" class="oe_highlight" type="object" attrs="{'invisible': ['|',('state', 'in', ['cancel', 'approve']), ('is_approved', '=', True)]}"/>
+                        <button name="action_refuse" string="Refuse" type="object" attrs="{'invisible':[('state', 'in', ['draft', 'cancel'])]}"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,submit,approve,cancel"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title mb24">
+                            <h1>
+                                <field name="name" class="text-break" default_focus="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="request_by"/>
+                                <field name="approval_name_id" attrs="{'readonly':[('state', 'not in', ['draft'])]}"/>
+                                <field name="payment"/>
+                                <field name="user_ids" widget="many2many_tags" readonly="1"/>
+                                <field name="request_id" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="request_date"/>
+                                <field name="product_id"/>
+                                <field name="approved_ids" invisible="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page name="description_page" string="Description">
+                                <field name="description" type="html" options="{'collaborative': true}"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_my_approval_view">
+            <field name="name">My Approvals</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">my.approval</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="bi_approval_app.view_my_approval_tree"/>
+        </record>
+
+        <menuitem id="main_menu_approval_config" parent="bi_approval_app.root_menu_approval_mng" name="Approvals" sequence="2"/>
+
+        <menuitem id="menu_my_approvals" name="To review" action="bi_approval_app.action_my_approval_view" parent="bi_approval_app.main_menu_approval_config" sequence="1"/>
+    </data>
+</odoo>

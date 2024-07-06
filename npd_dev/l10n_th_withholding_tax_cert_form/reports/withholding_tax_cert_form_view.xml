@@ -395,17 +395,65 @@
             <p class="total_tax">
                 <t t-esc="'{0:,.2f}'.format(total_amount_tax)" />
             </p>
+           <t t-set="total_amount_tax_sum" t-value="round(total_amount_tax, 2)"/>
+
+            <!-- แปลงจำนวนเงินเป็นข้อความภาษาไทย -->
             <p class="text_amount">
-                <t
-                    t-esc="o.currency_id.with_context({'lang': 'th_TH'}).amount_to_text(total_amount_tax)"
-                />
+                <span>
+                    <t t-esc="o.amount_to_text_custom(total_amount_tax_sum)"/>
+                </span>
+
             </p>
+
+
             <t t-if="o.tax_payer == 'withholding'">
                 <p class="choich_withholding_tax">X</p>
             </t>
             <t t-if="o.tax_payer == 'paid_one_time'">
                 <p class="choich_paid_one_time">X</p>
             </t>
+            <p class="set_name"> <span t-esc="user.name"></span> </p>
+
+            <t t-if="request.db == 'NPD_Bangkok_New'">
+                <p class="set_logo_NPD_Bangkok_New">
+                    <img t-att-src="'/l10n_th_withholding_tax_cert_form/static/description/NPD_Bangkok_New.png'" style="max-height: 310px;"/>
+                </p>
+            </t>
+
+            <t t-if="request.db == 'NPD_Intertrading_New'">
+                <p class="set_logo_NPD_Intertrading_New">
+                    <img t-att-src="'/l10n_th_withholding_tax_cert_form/static/description/NPD_Intertrading_New.png'" style="max-height: 330px;"/>
+
+                </p>
+            </t>
+
+            <t t-if="request.db == 'NPD_Logistics_New'">
+                <p class="set_logo_NPD_Logistics_New">
+                    <img t-att-src="'/l10n_th_withholding_tax_cert_form/static/description/NPD_Logistics_New.png'" style="max-height: 330px;"/>
+
+                </p>
+            </t>
+
+            <t t-if="request.db == 'NPD_S_Group_New'">
+                <p class="set_logo_NPD_S_Group_New">
+                    <img t-att-src="'/l10n_th_withholding_tax_cert_form/static/description/NPD_S_Group_New1.png'" style="max-height: 210px;"/>
+
+                </p>
+            </t>
+
+            <t t-if="request.db == 'NPD_Steeltech_New'">
+                <p class="set_logo_NPD_Steeltech_New">
+                    <img t-att-src="'/l10n_th_withholding_tax_cert_form/static/description/NPD_Steeltech_New.png'" style="max-height: 330px;"/>
+
+                </p>
+            </t>
+
+
+
+            <t t-set="year" t-value="(int((o.date).strftime('%Y')))+543" />
+            <t t-set="date" t-value="'%s/%s' %((o.date).strftime('%d/%m'),year)" />
+            <p class="set_date"> <span t-esc="date"></span> </p>
+
         </div>
     </template>
     <template id="wt_cert_form">

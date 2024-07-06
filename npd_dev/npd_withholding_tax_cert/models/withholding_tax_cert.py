@@ -8,3 +8,5 @@ class WithholdingTaxCert(models.Model):
         ('supplier', 'Supplier'),
         ('branch', 'Branch')
     ], string="Filters Supplier/Branch", default="supplier", store=True)
+
+    currency_id = fields.Many2one('res.currency', readonly=False)

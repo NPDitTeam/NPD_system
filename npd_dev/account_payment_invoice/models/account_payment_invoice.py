@@ -447,9 +447,33 @@ class AccountPayment(models.Model):
         self.amount = self.paid_amount - self.wht_amount
 
 
+    # def action_post(self):
+    #     """draft -> posted"""
+    #
+    #     #* Check invoice paid total is zero to remove
+    #     if not self.invoice_ids:
+    #         raise UserError(_("Not Invoice line to confirm payment."))
+    #     if self.amount == 0 or self.paid_amount == 0:
+    #         raise UserError(_("Invoice amount or Payment amount is zero please invoice Paid Total and Payment Total"))
+    #     for line in self.invoice_ids:
+    #         if line.paid_total == 0:
+    #             line.sudo().unlink()
+    #
+    #     self.move_id._post(soft=False)
+    #
+    #     # npd******************************************************************************
+    #     if self.move_id.state == "posted":
+    #         self.group_account_tax_invoice()
+    #         self.cheque_assigned()
+    #     else:
+    #         self._reconcile_payment()
+    #         self.group_account_tax_invoice()
+    #         self.cheque_assigned()
+    #
+    #     # npd******************************************************************************
+
     def action_post(self):
         """draft -> posted"""
-
         #* Check invoice paid total is zero to remove
         if not self.invoice_ids:
             raise UserError(_("Not Invoice line to confirm payment."))
@@ -460,18 +484,9 @@ class AccountPayment(models.Model):
                 line.sudo().unlink()
 
         self.move_id._post(soft=False)
-
-        # npd******************************************************************************
-        if self.move_id.state == "posted":
-            self.group_account_tax_invoice()
-            self.cheque_assigned()
-        else:
-            self._reconcile_payment()
-            self.group_account_tax_invoice()
-            self.cheque_assigned()
-
-        # npd******************************************************************************
-
+        self._reconcile_payment()
+        self.group_account_tax_invoice()
+        self.cheque_assigned()
 
     def group_account_tax_invoice(self):
         for tax_invoice in self.tax_invoice_ids:

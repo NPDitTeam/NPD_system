@@ -7,7 +7,7 @@
     "summary": "Npd Related Products Sales",
     "website": "https://npd9.com/",
     "license": "AGPL-3",
-    "depends": ['l10n_th_withholding_tax_cert', 'l10n_th_withholding_tax_cert_form'],
+    "depends": ['l10n_th_withholding_tax_cert', 'l10n_th_withholding_tax_cert_form','base'],
     "data": [
         "views/withholding_tax_cert_views.xml",
     ],

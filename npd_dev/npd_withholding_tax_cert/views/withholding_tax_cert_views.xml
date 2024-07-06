@@ -12,6 +12,11 @@
                     <field name="filter_supplier_branch" widget="radio" options="{'horizontal': True}"/>
 
                 </xpath>
+                <xpath expr="//field[@name='date']" position="after">
+
+                    <field name="currency_id" />
+
+                </xpath>
 
             </field>
         </record>

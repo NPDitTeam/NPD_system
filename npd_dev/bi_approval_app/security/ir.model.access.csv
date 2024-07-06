@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+bi_approval_app.access_approval_type_user,access_approval_type,model_approval_type,bi_approval_app.group_approval_user,1,0,0,0
+bi_approval_app.access_approval_type_manager,access_approval_type,model_approval_type,bi_approval_app.group_approval_manager,1,1,1,1
+bi_approval_app.access_approval_request,access_approval_request,bi_approval_app.model_approval_request,base.group_user,1,1,1,1
+bi_approval_app.access_my_approval,access_my_approval,bi_approval_app.model_my_approval,base.group_user,1,1,1,1
+bi_approval_app.access_file_attachment_wizard,access_file_attachment_wizard,bi_approval_app.model_file_attachment_wizard,base.group_user,1,1,1,1
+bi_approval_app.access_multi_approval_type_line,access_multi_approval_type_line,bi_approval_app.model_multi_approval_type_line,base.group_user,1,1,1,1
