@@ -1,5 +1,6 @@
 <odoo>
     <!-- Header -->
+
     <template id="external_layout_standard_pv">
         <div t-attf-class="header o_company_#{company.id}_layout" t-att-style="report_header_style"
              style="margin-bottom: 0px !important;">
@@ -302,7 +303,7 @@
             </t>
         </t>
 
-        <t t-call="npd_npd_journal_voucher_qweb.external_layout_standard_pv">
+        <t t-call="pfb_npd_journal_voucher_qweb.external_layout_standard_pv">
             <t t-raw="0"/>
         </t>
     </template>
@@ -310,7 +311,7 @@
     <template id="payment_voucher_pdf">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
-                <t t-call="npd_npd_journal_voucher_qweb.external_layout_pv">
+                <t t-call="pfb_npd_journal_voucher_qweb.external_layout_pv">
                     <style>
                         span.checkbox {
                         display: inline-block;
@@ -352,6 +353,7 @@
                                 <t t-set="sum_debit_note_ids" t-value="0"/>
                                 <t t-set="count_line" t-value="0"/>
                                 <t t-set="count_line_yn" t-value="n"/>
+
                                 <t t-if="o_value['group_inv']">
                                     <t t-foreach="o_value['group_inv']" t-as="line_inv">
                                         <t t-set="count_line" t-value="count_line + 1"/>
@@ -369,39 +371,57 @@
                                             <td>
                                                 <t t-esc="line_inv.name"/>
                                             </td>
-                                            <td style="width:250px;">
-                                                <t t-esc="line_inv.ref"/>
+
+                                            <td colspan="2">
+                                                <table width="100%">
+
+                                                    <t t-foreach="line_inv.line_ids" t-as="product_line">
+                                                        <tr>
+                                                            <td style="width: 280px;">
+
+                                                                    <t t-esc="product_line.product_id.name"/>
+
+                                                            </td>
+                                                            <td style="text-align: right;">
+
+                                                                    <t t-esc="'{0:,.2f}'.format(product_line.price_subtotal)"/>
 
 
+
+                                                            </td>
+                                                        </tr>
+
+                                                        <!-- Check if product_line_sum is None and handle it -->
+
+                                                    </t>
+
+
+                                                </table>
                                             </td>
-                                            <!--                                            <td width="15%" style="color: white">.</td>-->
-                                            <td align="right">
-                                                <t t-set="sum_inv" t-value="sum_inv + line_inv.amount_total"/>
-                                                <t t-esc="'{0:,.2f}'.format(line_inv.amount_total)"/>
-                                            </td>
+
 
                                         </tr>
-                                        <t t-foreach="line_inv.refund_invoice_ids" t-as="line_refund_invoice_ids">
-                                            <tr>
-                                                <td align="center">
+<!--                                        <t t-foreach="line_inv.refund_invoice_ids" t-as="line_refund_invoice_ids">-->
+<!--                                            <tr>-->
+<!--                                                <td align="center">-->
 
-                                                </td>
-                                                <td>
-                                                    <t t-esc="line_refund_invoice_ids.name"/>
-                                                </td>
-                                                <td style="width:250px;">
-                                                    <t t-esc="line_refund_invoice_ids.ref"/>
-                                                </td>
-                                                <td align="right">
+<!--                                                </td>-->
+<!--                                                <td>-->
+<!--                                                    <t t-esc="line_refund_invoice_ids.name"/>-->
+<!--                                                </td>-->
+<!--                                                <td style="width:250px;">-->
+<!--                                                    <t t-esc="line_refund_invoice_ids.ref"/>-->
+<!--                                                </td>-->
+<!--                                                <td align="right">-->
 
-                                                    <t t-set="sum_refund_invoice_ids"
-                                                       t-value="sum_refund_invoice_ids + line_refund_invoice_ids.amount_total"/>
-                                                    <t t-esc="'{0:,.2f}'.format(line_refund_invoice_ids.amount_total)"/>
+<!--                                                    <t t-set="sum_refund_invoice_ids"-->
+<!--                                                       t-value="sum_refund_invoice_ids + line_refund_invoice_ids.amount_total"/>-->
+<!--                                                    <t t-esc="'{0:,.2f}'.format(line_refund_invoice_ids.amount_total)"/>-->
                                                     <!--<t t-set="sum_inv" t-value="sum_inv + line_inv.amount_total"/>
                                                     <t t-esc="'{0:,.2f}'.format(line_inv.amount_total)"/>-->
-                                                </td>
-                                            </tr>
-                                        </t>
+<!--                                                </td>-->
+<!--                                            </tr>-->
+
                                         <!--<t t-foreach="line_inv.debit_note_ids" t-as="line_debit_note_ids">
                                             <tr>
                                                 <td align="center">
@@ -421,20 +441,50 @@
                                             </tr>
                                         </t>         -->
 
-                                    </t>
-                                </t>
-                                <tr>
-                                    <td colspan="3" align="right">รวม</td>
-                                    <td align="right"
-                                        style="border-bottom: double;border-top: 1px solid black;">
-                                        <t t-if="sum_inv != 0">
-                                            <t t-esc="'{:,.2f}'.format(sum_inv - sum_refund_invoice_ids + sum_debit_note_ids)"/>
-                                        </t>
-                                        <t t-else="">
-                                            <p><!--.--></p>
-                                        </t>
-                                    </td>
+<!--                                    </t>-->
+                                             <!-- VAT row -->
+                                                    <tr>
+                                                        <td colspan="3" align="right">VAT</td>
+
+                                                        <td align="right" style="border-bottom: double;border-top: 1px solid black;">
+                                                                <t t-set="vat_total" t-value="0.00"/>
+
+                                                             <t t-foreach="line_inv.tax_invoice_ids" t-as="tax">
+                                                              <t t-if="tax.balance">
+                                                              <t t-set="vat_total" t-value="vat_total + tax.balance"/>
+                                                            </t>
+                                                                </t>
+                                                                <strong>
+                                                                <t t-esc="'{0:,.2f}'.format(vat_total)"/>
+                                                                </strong>
+                                                        </td>
+                                                    </tr>
+                                    <tr>
+
+                                       <td colspan="3" align="right">รวม</td>
+                                            <td align="right" style="border-bottom: double; border-top: 1px solid black;">
+                                                <!-- Initialize the sum_total variable -->
+                                                <t t-set="sum_total" t-value="0.0"/>
+
+                                                <!-- Loop through line_inv.line_ids to sum up the price_subtotal -->
+                                                <t t-foreach="line_inv.line_ids" t-as="product_line">
+                                                    <!-- Ensure price_subtotal is treated as a float and not None -->
+                                                    <t t-if="product_line and product_line.price_subtotal and product_line.price_subtotal > 0">
+                                                        <t t-set="subtotal" t-value="product_line.price_subtotal"/>
+                                                        <t t-set="sum_total" t-value="sum_total + subtotal"/>
+                                                    </t>
+                                                </t>
+
+                                                <!-- Display the total sum_total -->
+                                                <strong>
+                                                    <t t-esc="'{0:,.2f}'.format(sum_total)"/>
+                                                </strong>
+                                            </td>
+
+
                                 </tr>
+                                </t>
+                                 </t>
                             </tbody>
                         </table>
                     </div>
@@ -446,40 +496,80 @@
                     </t>
                     <div class="container" style="font-size:20px;">
                         <br/>
-                        <p style="font-size:20px;">
-                            <strong>รายละเอียดการชำระเงิน / Payment method</strong>
-                        </p>
-                        <p style="font-size:20px;">
-                            <t t-if="o_value['line_payment_obj'].payment_method_one_id.type == 'cash'">
-                                <span class="checkbox" style="position: relative;bottom: -1px">
-                                    <font style="font-size:25px;position: relative;bottom: 8px;">&amp;#10003;</font>
-                                </span>
-                            </t>
-                            <t t-else="">
-                                <span class="checkbox"></span>
-                            </t>
-                            &amp;nbsp;&amp;nbsp;เงินสด&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
+                            <p style="font-size:20px;">
+                                <strong>รายละเอียดการชำระเงิน / Payment method</strong>
+                            </p>
+                            <p style="font-size:20px;">
+                                <t t-if="o_value['line_payment_obj'].payment_method_one_id.type == 'cash'">
+                                    <span class="checkbox" style="position: relative; bottom: -3px; display: inline-block; width: 18px; height: 18px; border: 1px solid black; border-radius: 3px; background-color: #fff;">
+                                        <font style="font-size:18px; position: relative; bottom: 4px; left: 2px;">&#10003;</font>
+                                    </span>
+                                </t>
+                                <t t-else="">
+                                    <span class="checkbox" style="position: relative; bottom: -3px; display: inline-block; width: 18px; height: 18px; border: 1px solid black; border-radius: 3px; background-color: #fff;"></span>
+                                </t>
+                                &#160;&#160;เงินสด&#160;&#160;&#160;&#160;
 
-                            <t t-if="o_value['line_payment_obj'].payment_method_one_id.type == 'cheque'">
-                                <span class="checkbox" style="position: relative;bottom: -1px">
-                                    <font style="font-size:25px;position: relative;bottom: 8px;">&amp;#10003;</font>
-                                </span>
-                            </t>
-                            <t t-else="">
-                                <span class="checkbox"></span>
-                            </t>
-                            &amp;nbsp;&amp;nbsp;เช็ค&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
-                            <t t-if="o_value['line_payment_obj'].payment_method_one_id.type == 'bank'">
-                                <span class="checkbox" style="position: relative;bottom: -1px">
-                                    <font style="font-size:25px;position: relative;bottom: 8px;">&amp;#10003;</font>
-                                </span>
-                            </t>
-                            <t t-else="">
-                                <span class="checkbox"></span>
-                            </t>
-                            &amp;nbsp;&amp;nbsp;เงินโอน&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
-                            <span class="checkbox"></span>&amp;nbsp;&amp;nbsp;บัตรเครดิต&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;
-                        </p>
+                                <t t-if="o_value['line_payment_obj'].payment_method_one_id.type == 'cheque'">
+                                    <span class="checkbox" style="position: relative; bottom: -3px; display: inline-block; width: 18px; height: 18px; border: 1px solid black; border-radius: 3px; background-color: #fff;">
+                                        <font style="font-size:18px; position: relative; bottom: 4px; left: 2px;">&#10003;</font>
+                                    </span>
+                                </t>
+                                <t t-else="">
+                                    <span class="checkbox" style="position: relative; bottom: -3px; display: inline-block; width: 18px; height: 18px; border: 1px solid black; border-radius: 3px; background-color: #fff;"></span>
+                                </t>
+                                &#160;&#160;เช็ค&#160;&#160;&#160;&#160;
+
+                                <t t-if="o_value['line_payment_obj'].payment_method_one_id.type == 'bank'">
+                                    <span class="checkbox" style="position: relative; bottom: -3px; display: inline-block; width: 18px; height: 18px; border: 1px solid black; border-radius: 3px; background-color: #fff;">
+                                        <font style="font-size:18px; position: relative; bottom: 4px; left: 2px;">&#10003;</font>
+                                    </span>
+                                </t>
+                                <t t-else="">
+                                    <span class="checkbox" style="position: relative; bottom: -3px; display: inline-block; width: 18px; height: 18px; border: 1px solid black; border-radius: 3px; background-color: #fff;"></span>
+                                </t>
+                                &#160;&#160;เงินโอน&#160;&#160;&#160;&#160;
+
+                                <span class="checkbox" style="position: relative; bottom: -3px; display: inline-block; width: 18px; height: 18px; border: 1px solid black; border-radius: 3px; background-color: #fff;"></span>
+                                &#160;&#160;บัตรเครดิต&#160;&#160;&#160;&#160;
+                            </p>
+
+
+
+<!--                        <p style="font-size:20px;">-->
+<!--                            <strong>รายละเอียดการชำระเงิน / Payment method</strong>-->
+<!--                        </p>-->
+<!--                        <p style="font-size:20px;">-->
+<!--                            <t t-if="o_value['line_payment_obj'].payment_method_one_id.type == 'cash'">-->
+<!--                                <span class="checkbox" style="position: relative;bottom: -1px">-->
+<!--                                    <font style="font-size:25px;position: relative;bottom: 8px;">&amp;#10003;</font>-->
+<!--                                </span>-->
+<!--                            </t>-->
+<!--                            <t t-else="">-->
+<!--                                <span class="checkbox"></span>-->
+<!--                            </t>-->
+<!--                            &amp;nbsp;&amp;nbsp;เงินสด&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;-->
+
+<!--                            <t t-if="o_value['line_payment_obj'].payment_method_one_id.type == 'cheque'">-->
+<!--                                <span class="checkbox" style="position: relative;bottom: -1px">-->
+<!--                                    <font style="font-size:25px;position: relative;bottom: 8px;">&amp;#10003;</font>-->
+<!--                                </span>-->
+<!--                            </t>-->
+<!--                            <t t-else="">-->
+<!--                                <span class="checkbox"></span>-->
+<!--                            </t>-->
+<!--                            &amp;nbsp;&amp;nbsp;เช็ค&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;-->
+<!--                            <t t-if="o_value['line_payment_obj'].payment_method_one_id.type == 'bank'">-->
+<!--                                <span class="checkbox" style="position: relative;bottom: -1px">-->
+<!--                                    <font style="font-size:25px;position: relative;bottom: 8px;">&amp;#10003;</font>-->
+<!--                                </span>-->
+<!--                            </t>-->
+<!--                            <t t-else="">-->
+<!--                                <span class="checkbox"></span>-->
+<!--                            </t>-->
+<!--                            &amp;nbsp;&amp;nbsp;เงินโอน&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;-->
+<!--                            <span class="checkbox"></span>&amp;nbsp;&amp;nbsp;บัตรเครดิต&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;-->
+<!--                        </p>-->
 
                         <t t-set="cheque_name" t-value=""/>
                         <t t-set="cheque_date_cheque" t-value=""/>
@@ -649,61 +739,190 @@
                             </t>
                         </t>
                     </t>
-                    <div class="container" style="font-size:20px;">
-                        <br/>
-                        <strong>รายการบันทึกบัญชี</strong>
-                        <table width="100%">
-                            <thead align="center">
-                                <tr>
-                                    <th width="10%" align="center" style=" border-bottom: 1px solid black">รหัส</th>
-                                    <th width="35%" align="center"
-                                        style=" border-bottom: 1px solid black;padding-left:5px;">ชื่อบัญชี
-                                    </th>
-                                    <th align="center" width="15%" style=" border-bottom: 1px solid black">งบโครงการ
-                                    </th>
-                                    <th align="center" width="10%" style=" border-bottom: 1px solid black">เดบิต</th>
-                                    <th align="center" width="10%" style=" border-bottom: 1px solid black">เครดิต</th>
-                                </tr>
-                            </thead>
-                            <tbody valign="top">
-                                <t t-set="count_num" t-value="0"/>
-                                <t t-foreach="o_value['line_ids']" t-as="line">
-                                    <tr style=" vertical-align: top; ">
-                                        <td align="center">
-                                            <span t-esc="line_value['account_code']"/>
-                                        </td>
-                                        <td align="left">
-                                            <span t-esc="line_value['name']"/>
-                                        </td>
-                                        <td align="center" style="color: white;">
-                                            0.0
-                                        </td>
-                                        <td align="right">
-                                            <span t-esc="'{0:,.2f}'.format(line_value['debit'])"/>
-                                        </td>
-                                        <td align="right">
-                                            <span t-esc="'{0:,.2f}'.format(line_value['credit'])"/>
-                                        </td>
-                                    </tr>
-                                </t>
-                                <tr>
-                                    <td colspan="3" align="right" style="padding-right:5px;"></td>
-                                    <td align="right"
-                                        style=" border-bottom: double;border-top: 1px solid black;">
-                                        <span t-esc="'{0:,.2f}'.format(o_value['sum_debit'])"/>
-                                    </td>
-                                    <td align="right"
-                                        style="border-bottom: double;border-top: 1px solid black;">
-                                        <span t-esc="'{0:,.2f}'.format(o_value['sum_credit'])"/>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <br/>
-                        <p>หมายเหตุ :
-                            <span t-esc="o_value['narration']"/>
-                        </p>
-                    </div>
+
+<t t-set="product_line_count" t-value="0"/>
+<t t-foreach="docs" t-as="o">
+    <t t-set="line_count_check" t-value="len(o_value['group_inv']) if o_value['group_inv'] else 0"/>
+
+<!--    <span t-esc="line_count_check"/>-->
+
+    <t t-if="line_count_check > 0">
+        </t>
+
+    <t t-else="">
+
+        <div class="container" style="font-size:20px;">
+                <br/>
+                <strong>รายการบันทึกบัญชี</strong>
+<!--                <span t-esc="line_count"/>-->
+                <table width="100%">
+                    <thead align="center">
+                        <tr>
+                            <th width="10%" align="center" style="border-bottom: 1px solid black">รหัส</th>
+                            <th width="35%" align="center" style="border-bottom: 1px solid black;padding-left:5px;">ชื่อบัญชี</th>
+                            <th align="center" width="15%" style="border-bottom: 1px solid black">งบโครงการ</th>
+                            <th align="center" width="10%" style="border-bottom: 1px solid black">เดบิต</th>
+                            <th align="center" width="10%" style="border-bottom: 1px solid black">เครดิต</th>
+                        </tr>
+                    </thead>
+                    <tbody valign="top">
+                        <t t-foreach="o_value['line_ids']" t-as="line">
+                            <tr style="vertical-align: top;">
+                                <td align="center">
+                                    <span t-esc="line_value['account_code']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="line_value['name']"/>
+                                </td>
+                                <td align="center" style="color: white;">
+                                    0.0
+                                </td>
+                                <td align="right">
+                                    <span t-esc="'{0:,.2f}'.format(line_value['debit'])"/>
+                                </td>
+                                <td align="right">
+                                    <span t-esc="'{0:,.2f}'.format(line_value['credit'])"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr>
+                            <td colspan="3" align="right" style="padding-right:5px;"/>
+                            <td align="right" style="border-bottom: double;border-top: 1px solid black;">
+                                <span t-esc="'{0:,.2f}'.format(o_value['sum_debit'])"/>
+                            </td>
+                            <td align="right" style="border-bottom: double;border-top: 1px solid black;">
+                                <span t-esc="'{0:,.2f}'.format(o_value['sum_credit'])"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br/>
+                <p>หมายเหตุ :
+                    <span t-esc="o_value['narration']"/>
+                </p>
+            </div>
+
+    </t>
+
+    <t t-foreach="o_value['group_inv']" t-as="line_inv">
+        <t t-set="product_line_count" t-value="0"/>
+        <t t-foreach="line_inv.line_ids" t-as="product_line">
+            <t t-set="product_line_count" t-value="product_line_count + 1"/>
+        </t>
+        <t t-set="line_count" t-value="product_line_count"/>
+
+
+        <t t-if="line_count &lt;= 5">
+            <div class="container" style="font-size:20px;">
+                <br/>
+                <strong>รายการบันทึกบัญชี</strong>
+<!--                <span t-esc="line_count"/>-->
+                <table width="100%">
+                    <thead align="center">
+                        <tr>
+                            <th width="10%" align="center" style="border-bottom: 1px solid black">รหัส</th>
+                            <th width="35%" align="center" style="border-bottom: 1px solid black;padding-left:5px;">ชื่อบัญชี</th>
+                            <th align="center" width="15%" style="border-bottom: 1px solid black">งบโครงการ</th>
+                            <th align="center" width="10%" style="border-bottom: 1px solid black">เดบิต</th>
+                            <th align="center" width="10%" style="border-bottom: 1px solid black">เครดิต</th>
+                        </tr>
+                    </thead>
+                    <tbody valign="top">
+                        <t t-foreach="o_value['line_ids']" t-as="line">
+                            <tr style="vertical-align: top;">
+                                <td align="center">
+                                    <span t-esc="line_value['account_code']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="line_value['name']"/>
+                                </td>
+                                <td align="center" style="color: white;">
+                                    0.0
+                                </td>
+                                <td align="right">
+                                    <span t-esc="'{0:,.2f}'.format(line_value['debit'])"/>
+                                </td>
+                                <td align="right">
+                                    <span t-esc="'{0:,.2f}'.format(line_value['credit'])"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr>
+                            <td colspan="3" align="right" style="padding-right:5px;"/>
+                            <td align="right" style="border-bottom: double;border-top: 1px solid black;">
+                                <span t-esc="'{0:,.2f}'.format(o_value['sum_debit'])"/>
+                            </td>
+                            <td align="right" style="border-bottom: double;border-top: 1px solid black;">
+                                <span t-esc="'{0:,.2f}'.format(o_value['sum_credit'])"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br/>
+                <p>หมายเหตุ :
+                    <span t-esc="o_value['narration']"/>
+                </p>
+            </div>
+        </t>
+        <t t-else="">
+            <div class="container" style="font-size:20px;">
+                <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+                <strong>รายการบันทึกบัญชี</strong>
+<!--                <span t-esc="line_count"/>-->
+                <table width="100%">
+                    <thead align="center">
+                        <tr>
+                            <th width="10%" align="center" style="border-bottom: 1px solid black">รหัส</th>
+                            <th width="35%" align="center" style="border-bottom: 1px solid black;padding-left:5px;">ชื่อบัญชี</th>
+                            <th align="center" width="15%" style="border-bottom: 1px solid black">งบโครงการ</th>
+                            <th align="center" width="10%" style="border-bottom: 1px solid black">เดบิต</th>
+                            <th align="center" width="10%" style="border-bottom: 1px solid black">เครดิต</th>
+                        </tr>
+                    </thead>
+                    <tbody valign="top">
+                        <t t-foreach="o_value['line_ids']" t-as="line">
+                            <tr style="vertical-align: top;">
+                                <td align="center">
+                                    <span t-esc="line_value['account_code']"/>
+                                </td>
+                                <td align="left">
+                                    <span t-esc="line_value['name']"/>
+                                </td>
+                                <td align="center" style="color: white;">
+                                    0.0
+                                </td>
+                                <td align="right">
+                                    <span t-esc="'{0:,.2f}'.format(line_value['debit'])"/>
+                                </td>
+                                <td align="right">
+                                    <span t-esc="'{0:,.2f}'.format(line_value['credit'])"/>
+                                </td>
+                            </tr>
+                        </t>
+                        <tr>
+                            <td colspan="3" align="right" style="padding-right:5px;"/>
+                            <td align="right" style="border-bottom: double;border-top: 1px solid black;">
+                                <span t-esc="'{0:,.2f}'.format(o_value['sum_debit'])"/>
+                            </td>
+                            <td align="right" style="border-bottom: double;border-top: 1px solid black;">
+                                <span t-esc="'{0:,.2f}'.format(o_value['sum_credit'])"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <br/>
+                <p>หมายเหตุ :
+                    <span t-esc="o_value['narration']"/>
+                </p>
+            </div>
+        </t>
+
+
+    </t>
+</t>
+
+
+
                     <div class="footer">
                         <div class="last-page">
                             <table style="width:100%">
